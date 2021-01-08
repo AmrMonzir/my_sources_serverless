@@ -34,6 +34,7 @@ functions:
           path: get-user/{ID}
           method: GET
           cors: true 
+
   getPlayerScore:
     handler: lambdas/endpoints/getPlayerScore.handler
     events:
@@ -41,27 +42,7 @@ functions:
           path: get-player-score/{ID}
           method: GET
           cors: true 
-  createUser:
-    handler: lambdas/endpoints/createUser.handler
-    events:
-      - http:
-          path: create-user/{ID}
-          method: POST
-          cors: true
-  updateUser:
-    handler: lambdas/endpoints/updateUser.handler
-    events:
-      - http:
-          path: update-user/{ID}
-          method: PUT
-          cors: true
-  createFolder:
-    handler: lambdas/endpoints/createFolder.handler
-    events:
-      - http:
-          path: create-folder/{ID}
-          method: POST
-          cors: true
+
   listAllUserFolders:
     handler: lambdas/endpoints/listAllUserFolders.handler
     events:
@@ -69,6 +50,15 @@ functions:
           path: list-user-folders/{ID}
           method: GET
           cors: true
+
+  getFolderKeys:
+    handler: lambdas/endpoints/getFolderKeys.handler
+    events:
+      - http:
+          path: get-folder-keys/{ID}
+          method: GET
+          cors: true
+
   listCategoryFolders:
     handler: lambdas/endpoints/listCategoryFolders.handler
     events:
@@ -76,6 +66,39 @@ functions:
           path: list-category-folders/{ID}
           method: POST
           cors: true
+
+  getCategoryKeys:
+    handler: lambdas/endpoints/getCategoryKeys.handler
+    events:
+      - http:
+          path: get-category-keys/{ID}
+          method: POST
+          cors: true
+
+  createUser:
+    handler: lambdas/endpoints/createUser.handler
+    events:
+      - http:
+          path: create-user/{ID}
+          method: POST
+          cors: true
+
+  updateUser:
+    handler: lambdas/endpoints/updateUser.handler
+    events:
+      - http:
+          path: update-user/{ID}
+          method: PUT
+          cors: true
+
+  createFolder:
+    handler: lambdas/endpoints/createFolder.handler
+    events:
+      - http:
+          path: create-folder/{ID}
+          method: POST
+          cors: true
+
 
 resources:
   Resources:
