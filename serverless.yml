@@ -24,7 +24,7 @@ provider:
 
 custom:
   usersTable: users
-  foldersTable: folderss
+  foldersTable: folders
 
 functions:
   getUser:
@@ -69,6 +69,13 @@ functions:
           path: list-user-folders/{ID}
           method: GET
           cors: true
+  listCategoryFolders:
+    handler: lambdas/endpoints/listCategoryFolders.handler
+    events:
+      - http:
+          path: list-category-folders/{ID}
+          method: POST
+          cors: true
 
 resources:
   Resources:
@@ -91,21 +98,18 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
-          - AttributeName: category
-            AttributeType: S
-          - AttributeName: user_id
+          - AttributeName: id_cat
             AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
-          - AttributeName: category
-            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
 
         GlobalSecondaryIndexes:
-          - IndexName: user_id
+          - IndexName: id_cat
             KeySchema:
-              - AttributeName: user_id
+              - AttributeName: id_cat
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+              

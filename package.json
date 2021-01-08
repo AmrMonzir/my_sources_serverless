@@ -11,5 +11,8 @@
   "dependencies": {
     "lambda-hooks": "^0.2.1",
     "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "serverless-offline": "^6.8.0"
   }
 }
