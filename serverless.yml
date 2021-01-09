@@ -75,6 +75,14 @@ functions:
           method: POST
           cors: true
 
+  addFile:
+    handler: lambdas/endpoints/addFile.handler
+    events:
+      - http:
+          path: add-file/{ID}
+          method: POST
+          cors: true
+
   deleteFolder:
     handler: lambdas/endpoints/deleteFolder.handler
     events:

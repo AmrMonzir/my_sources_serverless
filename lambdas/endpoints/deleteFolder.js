@@ -26,7 +26,7 @@ const handler = async event =>{
     
     await Dynamo.delete(folder_id, foldersTable);
 
-    return Responses._200();
+    return Responses._200({"message": "Success"});
 };
 
 exports.handler = withHooks(handler);

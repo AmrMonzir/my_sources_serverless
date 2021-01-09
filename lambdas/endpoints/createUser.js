@@ -19,6 +19,10 @@ const handler = async event => {
     user.phoneNumber = event.body.phoneNumber;
     user.email = event.body.email;
     user.totalAvailableSpace = "500 MB";
+    user.images = {"imagesKeys":[], "thumbnailsKeys":[]};
+    user.videos = {"videosKeys":[], "thumbnailsKeys":[]};
+    user.documents = {"docKeys":[]};
+    user.social = {"urls":[]};
 
     const newUser = await Dynamo.write(user, tableName);
 

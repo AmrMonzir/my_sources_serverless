@@ -31,12 +31,22 @@ const handler = async event =>{
     //generate random ID for folder
     let folder_id = uuidv4();
     console.log(folder_id);
-
+    var category = folder["category"].toLowerCase().trim();
     folder["ID"] = folder_id;
     folder["user_id"] = ID;
-    folder["id_cat"] = ID + folder["category"]
+    folder["id_cat"] = ID + category
+
+    if(category === "documents"){
+        folder["docKeys"] = [];
+    }else if(category === "images" || category === "videos"){
+        folder["content"] = {"contents" : [], "thumbnails" : []}
+    }else if(category === "social"){
+        folder["urls"] = [];
+    }
+
+
+
     console.log(folder);
-    
     const newFolder = await Dynamo.write(folder, foldersTable);
 
     return Responses._200({newFolder});

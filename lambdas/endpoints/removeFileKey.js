@@ -58,6 +58,7 @@ const handler = async event => {
         // });
 
         //TODO make sure this code works
+        //TODO account for doc and soc keys
         user[category][category + "Keys"].forEach(element => {
             if (fileKey !== element) {
                 newContent.push(element);
