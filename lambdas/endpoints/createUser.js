@@ -16,6 +16,9 @@ const handler = async event => {
     const user = event.body;
 
     user.ID = ID;
+    user.phoneNumber = event.body.phoneNumber;
+    user.email = event.body.email;
+    user.totalAvailableSpace = "500 MB";
 
     const newUser = await Dynamo.write(user, tableName);
 
@@ -23,7 +26,7 @@ const handler = async event => {
         return Responses._400({message: "Failed to write user by id"});
     }
 
-    return Responses._200({newUser});
+    return Responses._200(newUser);
 };
 
 exports.handler = withHooks(handler);

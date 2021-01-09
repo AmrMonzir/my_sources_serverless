@@ -2,7 +2,7 @@ const Responses = require("../common/API_Responses");
 const Dynamo = require("../common/Dynamo");
 const { withHooks } = require("../common/hooks");
 
-const tableName = process.env.foldersTable;
+const foldersTable = process.env.foldersTable;
 const usersTable = process.env.usersTable;
 
 const handler = async event =>{
@@ -22,19 +22,11 @@ const handler = async event =>{
         return Responses._404({ message: 'Failed to find user with that ID' });
     }
 
-    const category = event.body.category;
+    var folder_id = event.body.folder_id;
+    
+    await Dynamo.delete(folder_id, foldersTable);
 
-    console.log(event.body);
-    console.log(category);
-
-    const userFolders = await Dynamo.query({
-        tableName, 
-        index: 'id_cat',
-        queryKey: 'id_cat',
-        queryValue: ID+category,
-    });
-
-    return Responses._200(userFolders);
+    return Responses._200();
 };
 
 exports.handler = withHooks(handler);

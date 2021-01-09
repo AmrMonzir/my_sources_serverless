@@ -39,6 +39,20 @@ const Dynamo = {
 
         return data;
     },
+
+    async delete(ID, TableName){
+        const params = {
+            TableName,
+            Key: {
+                ID,
+            },
+        };
+        try{
+            await documentClient.delete(params).promise();
+        }catch( err){
+            return err;
+        }
+    },
      
     update: async ({ tableName, primaryKey, primaryKeyValue, updateKey, updateValue }) => {
         const params = {
@@ -51,6 +65,17 @@ const Dynamo = {
         };
         console.log("key = " + updateKey);
         console.log("val = " + updateValue);
+
+        return documentClient.update(params).promise();
+    },
+
+    removeItem: async ({ tableName, primaryKey, primaryKeyValue, updateKey, updateIndex }) => {
+        const params = {
+            TableName:tableName,
+            Key: { [primaryKey]: primaryKeyValue },
+            UpdateExpression: `remove ${updateKey}[${updateIndex}]`,
+            ReturnValues:"UPDATED_NEW"
+        };
 
         return documentClient.update(params).promise();
     },
@@ -72,6 +97,7 @@ const Dynamo = {
 
         return res.Items || [];
     }
+
 
 };
 

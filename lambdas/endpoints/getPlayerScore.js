@@ -19,7 +19,7 @@ const handler = async event =>{
         return Responses._400({message: "No user with that id"});
     }
 
-    return Responses._200({user});
+    return Responses._200(user);
 };
 
 exports.handler = withHooks(handler);

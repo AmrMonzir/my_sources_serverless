@@ -75,6 +75,14 @@ functions:
           method: POST
           cors: true
 
+  deleteFolder:
+    handler: lambdas/endpoints/deleteFolder.handler
+    events:
+      - http:
+          path: delete-folder/{ID}
+          method: POST
+          cors: true
+
   createUser:
     handler: lambdas/endpoints/createUser.handler
     events:
@@ -98,7 +106,13 @@ functions:
           path: create-folder/{ID}
           method: POST
           cors: true
-
+  removeFile:
+    handler: lambdas/endpoints/removeFileKey.handler
+    events:
+      - http:
+          path: remove-file/{KEY}
+          method: POST
+          cors: true
 
 resources:
   Resources:
