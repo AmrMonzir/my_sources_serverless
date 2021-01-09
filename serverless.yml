@@ -99,14 +99,6 @@ functions:
           method: POST
           cors: true
 
-  updateUser:
-    handler: lambdas/endpoints/updateUser.handler
-    events:
-      - http:
-          path: update-user/{ID}
-          method: PUT
-          cors: true
-
   createFolder:
     handler: lambdas/endpoints/createFolder.handler
     events:

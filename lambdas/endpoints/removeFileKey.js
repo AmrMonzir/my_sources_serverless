@@ -18,6 +18,7 @@ const handler = async event => {
     var user_id = event.body.user_id;
     var category = event.body.category;
     category = category.toLowerCase().trim();
+    let url = event.body.url;
 
     var newContent = [];
     var newThumbContent = [];
@@ -99,7 +100,7 @@ const handler = async event => {
             return Response._400({ "message": "Unrecognized category in users table" });
         }
 
-    } else if (folder_id && !user_id) {
+    } else if (folder_id) {
         //the key is in folders table
 
         if (category === "images" || category === "videos") {

@@ -42,6 +42,8 @@ const handler = async event =>{
         folder["content"] = {"contents" : [], "thumbnails" : []}
     }else if(category === "social"){
         folder["urls"] = [];
+    }else{
+        return Responses._400({"message": "Unrecognized category type"});
     }
 
 
@@ -49,7 +51,7 @@ const handler = async event =>{
     console.log(folder);
     const newFolder = await Dynamo.write(folder, foldersTable);
 
-    return Responses._200({newFolder});
+    return Responses._200(newFolder);
 };
 
 exports.handler = withHooks(handler);
