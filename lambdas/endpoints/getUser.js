@@ -1,5 +1,6 @@
 const Responses = require("../common/API_Responses");
 
+const usersTable = process.env.usersTable;
 exports.handler = async event =>{
     console.log('event', event);
 
@@ -9,18 +10,13 @@ exports.handler = async event =>{
     }
 
     let ID = event.pathParameters.ID;
+    const user = await Dynamo.get(ID, usersTable);
 
-    if(data[ID]){
+    if(user){
         //return the data
         return Responses._200(data[ID]);
     }
 
     //failed as ID was not in the data
     return Responses._400({message : 'No ID in data'});
-}
-
-const data = {
-    1234: {name: 'Anna Jones', age: 25, job: 'journalist'},
-    7893: {name: 'Chris Smith', age: 53, job: 'teacher'},
-    1235: {name: 'tom', age: 13, job: 'retard'},
 }

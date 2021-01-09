@@ -35,14 +35,6 @@ functions:
           method: GET
           cors: true 
 
-  getPlayerScore:
-    handler: lambdas/endpoints/getPlayerScore.handler
-    events:
-      - http:
-          path: get-player-score/{ID}
-          method: GET
-          cors: true 
-
   listAllUserFolders:
     handler: lambdas/endpoints/listAllUserFolders.handler
     events:
