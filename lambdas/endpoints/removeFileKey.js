@@ -1,9 +1,8 @@
-const { _400 } = require("../common/API_Responses");
 const Responses = require("../common/API_Responses");
 const Dynamo = require("../common/Dynamo");
 const { withHooks } = require("../common/hooks");
 
-const tableName = process.env.foldersTable;
+const foldersTable = process.env.foldersTable;
 const usersTable = process.env.usersTable;
 
 const handler = async event => {
@@ -13,8 +12,6 @@ const handler = async event => {
         return Responses._400({ message: 'Missing the file key from the path' });
     }
 
-
-    //TODO file could be in users table if not in a folder
 
     let fileKey = event.pathParameters.KEY;
     var folder_id = event.body.folder_id;
@@ -33,90 +30,137 @@ const handler = async event => {
         console.log("printing user category");
         console.log(user[category]);
 
-        // var indexOfKey = user[category][category + "Keys"].indexOf(fileKey);
-        // var indexOfThumb = user[category]["thumbnailsKeys"].indexOf("thumb-" + fileKey);
-
-        // console.log("index of key");
-        // console.log(indexOfKey);
-        // console.log("index of thumb");
-        // console.log(indexOfThumb);
-
-        // await Dynamo.removeItem({
-        //     usersTable,
-        //     primaryKey: 'ID',
-        //     primaryKeyValue: user_id,
-        //     updateKey: user[category][category + "Keys"],
-        //     updateIndex: indexOfKey
-        // });
-
-        // await Dynamo.removeItem({
-        //     usersTable,
-        //     primaryKey: 'ID',
-        //     primaryKeyValue: user_id,
-        //     updateKey: user[category]["thumbnailsKeys"],
-        //     updateIndex: indexOfThumb
-        // });
-
         //TODO make sure this code works
         //TODO account for doc and soc keys
-        user[category][category + "Keys"].forEach(element => {
-            if (fileKey !== element) {
-                newContent.push(element);
-            }
-        });
-        
-        user[category]["thumbnailsKeys"].forEach(element => {
-            var thumbkey = "thumb-" + fileKey;
-            if (thumbkey !== element) {
-                newThumbContent.push(element);
-            }
-        });
+        if (category === "images" || category === "videos") {
+            console.log("file in user entry, file is img or vid");
+            user[category][category + "Keys"].forEach(element => {
+                if (fileKey !== element) {
+                    newContent.push(element);
+                }
+            });
 
-        if(newContent.length === 0){
-            console.log("new content is empty");
-            newContent = [""];
-            newThumbContent = [""];
+            user[category]["thumbnailsKeys"].forEach(element => {
+                var thumbkey = "thumb-" + fileKey;
+                if (thumbkey !== element) {
+                    newThumbContent.push(element);
+                }
+            });
+
+            const concata = category + "Keys";
+
+            await Dynamo.update({
+                tableName: usersTable,
+                primaryKey: 'ID',
+                primaryKeyValue: user_id,
+                updateKey: `${category}`,
+                updateValue: {
+                    "concata": newContent,
+                    "thumbnailsKeys": newThumbContent
+                },
+                type: concata,
+            });
+        } else if (category === "documents") {
+            console.log("type is documents in users entry");
+            user[category]["docKeys"].forEach(element => {
+                if (fileKey !== element) {
+                    newContent.push(element);
+                }
+            });
+
+            await Dynamo.update({
+                tableName: usersTable,
+                primaryKey: 'ID',
+                primaryKeyValue: user_id,
+                updateKey: `${category}`,
+                updateValue: {
+                    "docKeys": newContent,
+                },
+            });
+        } else if (category === "social") {
+            console.log("type is social from category");
+
+            user[category]["urls"].forEach(element => {
+                if (url !== element) {
+                    newContent.push(element);
+                }
+            });
+
+            await Dynamo.update({
+                tableName: usersTable,
+                primaryKey: 'ID',
+                primaryKeyValue: user_id,
+                updateKey: `${category}`,
+                updateValue: {
+                    "urls": newContent,
+                },
+            });
+        } else {
+            return Response._400({ "message": "Unrecognized category in users table" });
         }
 
-        const concata = category + "Keys";
+    } else if (folder_id && !user_id) {
+        //the key is in folders table
 
-        await Dynamo.update({
-            usersTable,
-            primaryKey: 'ID',
-            primaryKeyValue: user_id,
-            updateKey: `${category}`,
-            updateValue: {
-                concata : newContent,
-                "thumbnailsKeys" : newThumbContent
-            },
-        });
-        
+        if (category === "images" || category === "videos") {
+
+            const folder = await Dynamo.get(folder_id, foldersTable);
+            console.log(folder);
+            folder.content.thumbnails.forEach(element => {
+                var thumbkey = "thumb-" + fileKey;
+                if (thumbkey !== element)
+                    newThumbContent.push(element);
+            });
+
+            folder.content.contents.forEach(element => {
+                if (fileKey !== element)
+                    newContent.push(element);
+            });
+            await Dynamo.update({
+                tableName: foldersTable,
+                primaryKey: 'ID',
+                primaryKeyValue: folder_id,
+                updateKey: "content",
+                updateValue: {
+                    "contents": newContent,
+                    "thumbnails": newThumbContent
+                },
+            });
+        }else if(category === "documents"){
+
+            console.log("type is docs");
+            folder["docKeys"].forEach(element => {
+                if (fileKey !== element)
+                    newContent.push(element);
+            });
+            await Dynamo.update({
+                tableName: foldersTable,
+                primaryKey: 'ID',
+                primaryKeyValue: folder_id,
+                updateKey: "docKeys",
+                updateValue: newContent,
+            });
+
+        }else if (category === "social"){
+            console.log("type is social");
+            folder["urls"].forEach(element => {
+                if (fileKey !== element)
+                    newContent.push(element);
+            });
+            await Dynamo.update({
+                tableName: foldersTable,
+                primaryKey: 'ID',
+                primaryKeyValue: folder_id,
+                updateKey: "urls",
+                updateValue: newContent
+            });
+        }else{
+            return Response._400({ "message": "Unrecognized category in folders table" });
+        }
+
 
     } else {
-        //the key is in folders table
-        const folder = await Dynamo.get(folder_id, tableName);
-        console.log(folder);
-        folder.content.thumbnails.forEach(element => {
-            var thumbkey = "thumb-" + fileKey;
-            if (thumbkey !== element)
-                newThumbContent.push(element);
-        });
-
-        folder.content.contents.forEach(element => {
-            if (fileKey !== element)
-                newContent.push(element);
-        });
-        await Dynamo.update({
-            tableName,
-            primaryKey: 'ID',
-            primaryKeyValue: folder_id,
-            updateKey: "content",
-            updateValue: {
-                "contents" : newContent,
-                "thumbnails" : newThumbContent
-            },
-        });
-
+        return Responses._400({ "message": "no folder_id or user_id found" });
     }
     return Responses._200({ "message": "Deleted file successfully" });
 };

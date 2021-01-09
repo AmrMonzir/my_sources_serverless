@@ -74,6 +74,14 @@ functions:
           path: get-category-keys/{ID}
           method: POST
           cors: true
+    
+  moveItem:
+    handler: lambdas/endpoints/moveItem.handler
+    events:
+      - http:
+          path: move-item/{ID}
+          method: POST
+          cors: true
 
   addFile:
     handler: lambdas/endpoints/addFile.handler

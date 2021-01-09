@@ -54,7 +54,12 @@ const Dynamo = {
         }
     },
      
-    update: async ({ tableName, primaryKey, primaryKeyValue, updateKey, updateValue }) => {
+    update: async ({ tableName, primaryKey, primaryKeyValue, updateKey, updateValue, type }) => {
+        if(type){
+            var tostr = JSON.stringify(updateValue);
+            tostr = tostr.replace("concata", type);
+            updateValue = JSON.parse(tostr);
+        }
         const params = {
             TableName: tableName,
             Key: { [primaryKey]: primaryKeyValue },
@@ -63,8 +68,9 @@ const Dynamo = {
                 ':updateValue': updateValue,
             },
         };
-        console.log("key = " + updateKey);
-        console.log("val = " + updateValue);
+        console.log(tableName);
+        console.log(updateKey);
+        console.log(updateValue);
 
         return documentClient.update(params).promise();
     },
