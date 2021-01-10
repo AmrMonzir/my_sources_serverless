@@ -33,7 +33,7 @@ const handler = async event => {
 
     var updatedContent = [];
     var updatedThumbContent = [];
-
+    let isFound = false;
 
     var destFolder = await Dynamo.get(destFolderID, foldersTable);
     if(!destFolder){
@@ -59,9 +59,13 @@ const handler = async event => {
                 var thumbkey = "thumb-" + fileKey;
                 if (thumbkey !== element) {
                     updatedThumbContent.push(element);
+                }else{
+                    isFound = true;
                 }
             });
-
+            if(!isFound){
+                return Responses._400({"message": "cannot find the file specified"});
+            }
             const concata = category + "Keys";
 
             await Dynamo.update({
@@ -90,9 +94,13 @@ const handler = async event => {
             user[category]["docKeys"].forEach(element => {
                 if (fileKey !== element) {
                     updatedContent.push(element);
+                }else{
+                    isFound = true;
                 }
             });
-
+            if(!isFound){
+                return Responses._400({"message": "cannot find the file specified"});
+            }
             await Dynamo.update({
                 tableName: usersTable,
                 primaryKey: 'ID',
@@ -113,9 +121,12 @@ const handler = async event => {
             user[category]["urls"].forEach(element => {
                 if (url !== element) {
                     updatedContent.push(element);
-                }
+                }else
+                    isFound =true;
             });
-
+            if(!isFound){
+                return Responses._400({"message": "cannot find the file specified"});
+            }
             await Dynamo.update({
                 tableName: usersTable,
                 primaryKey: 'ID',
@@ -149,8 +160,12 @@ const handler = async event => {
             sourceFolder.content.contents.forEach(element => {
                 if (fileKey !== element)
                     updatedContent.push(element);
+                else
+                    isFound = true;
             });
-
+            if(!isFound){
+                return Responses._400({"message": "cannot find the file specified"});
+            }
             console.log(updatedContent);
             console.log(updatedThumbContent);
             console.log(foldersTable);
@@ -181,7 +196,12 @@ const handler = async event => {
             sourceFolder["docKeys"].forEach(element => {
                 if (fileKey !== element)
                     updatedContent.push(element);
+                else
+                    isFound = true;
             });
+            if(!isFound){
+                return Responses._400({"message": "cannot find the file specified"});
+            }
             await Dynamo.update({
                 tableName: foldersTable,
                 primaryKey: 'ID',
@@ -200,7 +220,12 @@ const handler = async event => {
             sourceFolder["urls"].forEach(element => {
                 if (fileKey !== element)
                     updatedContent.push(element);
+                    else
+                    isFound = true;
             });
+            if(!isFound){
+                return Responses._400({"message": "cannot find the file specified"});
+            }
             await Dynamo.update({
                 tableName: foldersTable,
                 primaryKey: 'ID',

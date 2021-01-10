@@ -12,7 +12,6 @@ const handler = async event => {
         return Responses._400({ message: 'Missing the file key from the path' });
     }
 
-
     let fileKey = event.pathParameters.KEY;
     var folder_id = event.body.folder_id;
     var user_id = event.body.user_id;
