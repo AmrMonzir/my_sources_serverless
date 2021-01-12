@@ -35,7 +35,6 @@ const handler = async event =>{
     folder["ID"] = folder_id;
     folder["user_id"] = ID;
     folder["id_cat"] = ID + category
-
     if(category === "documents"){
         folder["docKeys"] = [];
     }else if(category === "images" || category === "videos"){

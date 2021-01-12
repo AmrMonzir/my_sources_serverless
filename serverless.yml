@@ -106,6 +106,15 @@ functions:
           path: create-folder/{ID}
           method: POST
           cors: true
+          
+  updateFolder:
+    handler: lambdas/endpoints/updateFolder.handler
+    events:
+      - http:
+          path: update-folder/{ID}
+          method: POST
+          cors: true 
+
   removeFile:
     handler: lambdas/endpoints/removeFileKey.handler
     events:
