@@ -24,7 +24,7 @@ const handler = async event => {
 
     console.log(folder);
 
-    folder.content.contents.forEach(element => {
+    folder.content.thumbnails.forEach(element => {
         allKeys.push(element);
     });
 

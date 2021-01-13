@@ -24,7 +24,11 @@ const handler = async event => {
     //to add a file, I need the key and the user_id, and the folder_id if exists
 
     var fileKey = event.body.fileKey;
-    var thumbKey = "thumb-" + fileKey;
+
+    var indx = fileKey.indexOf("/");
+    var thumbKey = fileKey.slice(0, indx+1) + "thumb-" + fileKey.slice(indx+1);
+
+    // var thumbKey = "thumb-" + fileKey;
     var folder_id = event.body.folder_id;
     var category = event.body.category.toLowerCase().trim();
     var url = event.body.url;

@@ -16,6 +16,7 @@ provider:
   environment:
     usersTable: ${self:custom.usersTable}
     foldersTable: ${self:custom.foldersTable}
+    itemsTable: ${self:custom.itemsTable}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -25,6 +26,7 @@ provider:
 custom:
   usersTable: users
   foldersTable: folders
+  itemsTable: itemsTable
 
 functions:
   getUser:
@@ -158,4 +160,15 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-              
+
+    ItemsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.itemsTable}
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
