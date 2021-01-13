@@ -86,7 +86,7 @@ const Dynamo = {
         return documentClient.update(params).promise();
     },
 
-    query: async ({tableName, index, queryKey, queryValue}) => {
+    query: async ({tableName, index, queryKey, queryValue, startKey}) => {
         
         const  params = {
             TableName: tableName,
@@ -95,13 +95,14 @@ const Dynamo = {
             ExpressionAttributeValues: {
                 ':hkey': queryValue,
             },
+            ExclusiveStartKey: startKey
         };
         
         console.log(params.KeyConditionExpression);
 
         const res = await documentClient.query(params).promise();
 
-        return res.Items || [];
+        return res || [];
     }
 
 

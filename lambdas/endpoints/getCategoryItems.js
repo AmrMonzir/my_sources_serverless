@@ -2,8 +2,8 @@ const Responses = require("../common/API_Responses");
 const Dynamo = require("../common/Dynamo");
 const { withHooks } = require("../common/hooks");
 
-const tableName = process.env.foldersTable;
 const usersTable = process.env.usersTable;
+const itemsTable = process.env.itemsTable;
 
 const handler = async event =>{
 
@@ -23,34 +23,22 @@ const handler = async event =>{
     }
 
     const category = event.body.category;
+    const lastEvaluatedKey = event.body.startKey;
 
     console.log(event.body);
     console.log(category);
 
-    var allKeys = [];
-    
-    const userCategoryFolders = await Dynamo.query({
-        tableName, 
-        index: 'id_cat',
-        queryKey: 'id_cat',
-        queryValue: ID+category,
+
+    var response = await Dynamo.query({
+        tableName: itemsTable,
+        index: 'user_id',
+        queryKey: 'user_id',
+        queryValue: ID,
+        startKey: lastEvaluatedKey
     });
 
-    console.log(userCategoryFolders);
 
-    userCategoryFolders.forEach(element => {
-        element.content.contents.forEach(element=>{
-            allKeys.push(element);
-        });
-    });
-
-    if(user[category])
-        if(user[category][category+"Keys"])
-            user[category][category+"Keys"].forEach(element =>{
-                allKeys.push(element);
-                });
-
-    return Responses._200(allKeys);
+    return Responses._200({"items": response.items, "lastEvaluatedKey": response.LastEvaluatedKey});
 };
 
 exports.handler = withHooks(handler);

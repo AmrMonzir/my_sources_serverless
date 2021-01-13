@@ -28,23 +28,15 @@ const handler = async event =>{
 
     const folder = event.body;
 
-    //generate random ID for folder
-    let folder_id = uuidv4();
+    const folder_id = event.body.folder_id;
+
     console.log(folder_id);
     var category = folder["category"].toLowerCase().trim();
     folder["ID"] = folder_id;
     folder["user_id"] = ID;
     folder["id_cat"] = ID + category
-    if(category === "documents"){
-        folder["docKeys"] = [];
-    }else if(category === "images" || category === "videos"){
-        folder["content"] = {"contents" : [], "thumbnails" : []}
-    }else if(category === "social"){
-        folder["urls"] = [];
-    }else{
-        return Responses._400({"message": "Unrecognized category type"});
-    }
-
+    folder["folder_size"] = 0;
+    folder["contents"] = [];
 
 
     console.log(folder);

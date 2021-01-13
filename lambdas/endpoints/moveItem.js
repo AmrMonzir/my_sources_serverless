@@ -4,6 +4,7 @@ const { withHooks } = require("../common/hooks");
 
 const foldersTable = process.env.foldersTable;
 const usersTable = process.env.usersTable;
+const itemsTable = process.env.itemsTable;
 
 /**
  * inputs: fileKey, source(category or folder), destination 
@@ -28,220 +29,99 @@ const handler = async event => {
     var category = event.body.category.toLowerCase().trim();
     let destFolderID = event.body.destFolder;
     let sourceFolderID = event.body.sourceFolder;
-    let url = event.body.url;
-    let fileKey = event.body.fileKey;
+    var item_id = event.body.item_id;
 
     var updatedContent = [];
-    var updatedThumbContent = [];
-    let isFound = false;
 
     var destFolder = await Dynamo.get(destFolderID, foldersTable);
-    if(!destFolder){
-        return Responses._400({"message": "can't find folder in db"});
+
+    if (!destFolder) {
+        return Responses._400({ "message": "can't find folder in db" });
     }
-    if(destFolder.user_id !== user_id){
-        return Responses._400({"message": "can't move to a different user's folder"});
+    if (destFolder.user_id !== user_id) {
+        return Responses._400({ "message": "can't move to a different user's folder" });
     }
-    
+
     if (sourceType === "category") {
         var user = await Dynamo.get(user_id, usersTable);
 
-        if (category === "images" || category === "videos") {
-            console.log("type is img or vid from category");
+        if (!user)
+            return Responses._400({ "message": "Can't find this user" });
 
-            user[category][category + "Keys"].forEach(element => {
-                if (fileKey !== element) {
-                    updatedContent.push(element);
-                }
-            });
+        var item = await Dynamo.get(item_id, itemsTable);
 
-            user[category]["thumbnailsKeys"].forEach(element => {
-                var thumbkey = "thumb-" + fileKey;
-                if (thumbkey !== element) {
-                    updatedThumbContent.push(element);
-                }else{
-                    isFound = true;
-                }
-            });
-            if(!isFound){
-                return Responses._400({"message": "cannot find the file specified"});
-            }
-            const concata = category + "Keys";
+        if (!item)
+            return Responses._400({ "message": "Can't find this item" });
 
-            await Dynamo.update({
-                tableName: usersTable,
-                primaryKey: 'ID',
-                primaryKeyValue: user_id,
-                updateKey: `${category}`,
-                updateValue: {
-                    "concata": updatedContent,
-                    "thumbnailsKeys": updatedThumbContent
-                },
-                type: concata,
-            });
+        var categoryContent = user[category];
 
-            console.log("successfully deleted key from category");
-            //now add this file key to the destination folder id
+        console.log(categoryContent);
 
-            var thumbkey = "thumb-" + fileKey;
-            destFolder.content.contents.push(fileKey);
-            destFolder.content.thumbnails.push(thumbkey);
-            res = await Dynamo.write(destFolder, foldersTable);
+        categoryContent.forEach(element => {
+            if (item_id !== element)
+                updatedContent.push(element);
+        });
 
-        } else if (category === "documents") {
-            console.log("type is docs from category");
+        console.log("should now have deleted the item from category in userstable");
+        console.log(updatedContent);
 
-            user[category]["docKeys"].forEach(element => {
-                if (fileKey !== element) {
-                    updatedContent.push(element);
-                }else{
-                    isFound = true;
-                }
-            });
-            if(!isFound){
-                return Responses._400({"message": "cannot find the file specified"});
-            }
-            await Dynamo.update({
-                tableName: usersTable,
-                primaryKey: 'ID',
-                primaryKeyValue: user_id,
-                updateKey: `${category}`,
-                updateValue: {
-                    "docKeys": updatedContent,
-                },
-            });
-            console.log("successfully deleted key from category");
-            //now add this file key to the destination folder id
-            destFolder["docKeys"].push(fileKey);
-            res = await Dynamo.write(destFolder, foldersTable);
+        //now update users table to reflect the change
+        await Dynamo.update({
+            tableName: usersTable,
+            primaryKey: "ID",
+            primaryKeyValue: user_id,
+            updateKey: `${category}`,
+            updateValue: updatedContent
+        });
 
-        } else if (category === "social") {
-            console.log("type is social from category");
-
-            user[category]["urls"].forEach(element => {
-                if (url !== element) {
-                    updatedContent.push(element);
-                }else
-                    isFound =true;
-            });
-            if(!isFound){
-                return Responses._400({"message": "cannot find the file specified"});
-            }
-            await Dynamo.update({
-                tableName: usersTable,
-                primaryKey: 'ID',
-                primaryKeyValue: user_id,
-                updateKey: `${category}`,
-                updateValue: {
-                    "urls": updatedContent,
-                },
-            });
-            console.log("successfully deleted key from category");
-            //now add this file key to the destination folder id
-            destFolder["urls"].push(url);
-            res = await Dynamo.write(destFolder, foldersTable);
-        } else {
-            return Responses._400({ "message": "Error in category type" });
-        }
     } else if (sourceType === "folder") {
         var sourceFolder = await Dynamo.get(sourceFolderID, foldersTable);
 
-        //check if category is images or videos or else
-        if (category === "images" || category === "videos") {
-            //first delete it from the lists
-            console.log("type is images or videos");
-            console.log(sourceFolder);
-            sourceFolder.content.thumbnails.forEach(element => {
-                var thumbkey = "thumb-" + fileKey;
-                if (thumbkey !== element)
-                    updatedThumbContent.push(element);
-            });
+        if (!sourceFolder)
+            return Responses._400({ "message": "Can't find source folder" });
 
-            sourceFolder.content.contents.forEach(element => {
-                if (fileKey !== element)
-                    updatedContent.push(element);
-                else
-                    isFound = true;
-            });
-            if(!isFound){
-                return Responses._400({"message": "cannot find the file specified"});
-            }
-            console.log(updatedContent);
-            console.log(updatedThumbContent);
-            console.log(foldersTable);
+        var item = await Dynamo.get(item_id, itemsTable);
+        if (!item)
+            return Responses._400({ "message": "Can't find this item" });
 
-            await Dynamo.update({
-                tableName: foldersTable,
-                primaryKey: 'ID',
-                primaryKeyValue: sourceFolderID,
-                updateKey: "content",
-                updateValue: {
-                    "contents": updatedContent,
-                    "thumbnails": updatedThumbContent
-                },
-            });
+        var sourceFolderContents = sourceFolder.contents;
 
-            console.log("successfully deleted key from source folder");
-            //now add this file key to the destination folder id
+        sourceFolderContents.forEach(element => {
+            if (element !== item_id)
+                updatedContent.push(item_id);
+        });
 
-            var thumbkey = "thumb-" + fileKey;
-            destFolder.content.contents.push(fileKey);
-            destFolder.content.thumbnails.push(thumbkey);
-            res = await Dynamo.write(destFolder, foldersTable);
-
-        } else if (category === "documents") {
-            //first delete it from the lists
-
-            console.log("type is docs");
-            sourceFolder["docKeys"].forEach(element => {
-                if (fileKey !== element)
-                    updatedContent.push(element);
-                else
-                    isFound = true;
-            });
-            if(!isFound){
-                return Responses._400({"message": "cannot find the file specified"});
-            }
-            await Dynamo.update({
-                tableName: foldersTable,
-                primaryKey: 'ID',
-                primaryKeyValue: sourceFolderID,
-                updateKey: "docKeys",
-                updateValue: updatedContent,
-                
-            });
-            console.log("successfully deleted key from source folder");
-            //now add this file key to the destination folder id
-            destFolder["docKeys"].push(fileKey);
-            res = await Dynamo.write(destFolder, foldersTable);
-
-        } else if (category === "social") {
-            console.log("type is social");
-            sourceFolder["urls"].forEach(element => {
-                if (fileKey !== element)
-                    updatedContent.push(element);
-                    else
-                    isFound = true;
-            });
-            if(!isFound){
-                return Responses._400({"message": "cannot find the file specified"});
-            }
-            await Dynamo.update({
-                tableName: foldersTable,
-                primaryKey: 'ID',
-                primaryKeyValue: sourceFolderID,
-                updateKey: "urls",
-                updateValue: updatedContent
-            });
-            console.log("successfully deleted key from source folder");
-            //now copy add this file key to the destination folder id
-            destFolder["urls"].push(url);
-            res = await Dynamo.write(destFolder, foldersTable);
-
-        } else {
-            return Responses._400({ "message": "Unrecognized category type" });
-        }
+        //delete item id from source folder
+        await Dynamo.update({
+            tableName: foldersTable,
+            primaryKey: "ID",
+            primaryKeyValue: sourceFolderID,
+            updateKey: "contents",
+            updateValue: updatedContent
+        });
     }
+
+    //put item_id in dest folder
+    var folderContents = destFolder.contents;
+
+    folderContents.push(item_id);
+
+    await Dynamo.update({
+        tableName: foldersTable,
+        primaryKey: "ID",
+        primaryKeyValue: destFolderID,
+        updateKey: "content",
+        updateValue: folderContents
+    });
+    //reflect container folder change in itemsTable
+    await Dynamo.update({
+        tableName: itemsTable,
+        primaryKey: "ID",
+        primaryKeyValue: item_id,
+        updateKey: "folder_id",
+        updateValue: destFolderID
+    });
+
 
     return Responses._200({ "message": "Moved file successfully" });
 };

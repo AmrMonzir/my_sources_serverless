@@ -26,7 +26,7 @@ provider:
 custom:
   usersTable: users
   foldersTable: folders
-  itemsTable: itemsTable
+  itemsTable: items
 
 functions:
   getUser:
@@ -45,11 +45,11 @@ functions:
           method: GET
           cors: true
 
-  getFolderKeys:
-    handler: lambdas/endpoints/getFolderKeys.handler
+  getFolderItems:
+    handler: lambdas/endpoints/getFolderItems.handler
     events:
       - http:
-          path: get-folder-keys/{ID}
+          path: get-folder-items/{ID}
           method: GET
           cors: true
 
@@ -61,11 +61,11 @@ functions:
           method: POST
           cors: true
 
-  getCategoryKeys:
-    handler: lambdas/endpoints/getCategoryKeys.handler
+  getCategoryItems:
+    handler: lambdas/endpoints/getCategoryItems.handler
     events:
       - http:
-          path: get-category-keys/{ID}
+          path: get-category-items/{ID}
           method: POST
           cors: true
     
@@ -77,11 +77,11 @@ functions:
           method: POST
           cors: true
 
-  addFile:
-    handler: lambdas/endpoints/addFile.handler
+  addItem:
+    handler: lambdas/endpoints/addItem.handler
     events:
       - http:
-          path: add-file/{ID}
+          path: add-item/{ID}
           method: POST
           cors: true
 
@@ -117,11 +117,11 @@ functions:
           method: POST
           cors: true 
 
-  removeFile:
-    handler: lambdas/endpoints/removeFileKey.handler
+  removeItem:
+    handler: lambdas/endpoints/removeItem.handler
     events:
       - http:
-          path: remove-file/{KEY}
+          path: remove-item/{ID}
           method: POST
           cors: true
 
@@ -159,7 +159,7 @@ resources:
               - AttributeName: id_cat
                 KeyType: HASH
             Projection:
-              ProjectionType: ALL
+              ProjectionType: KEYS_ONLY
 
     ItemsTable:
       Type: AWS::DynamoDB::Table
@@ -168,7 +168,17 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
+          - AttributeName: fid_cat
+            AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+
+        GlobalSecondaryIndexes:
+          - IndexName: fid_cat
+            KeySchema:
+              - AttributeName: fid_cat
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL

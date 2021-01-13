@@ -24,9 +24,22 @@ const handler = async event =>{
 
     var folder_id = event.body.folder_id;
     
+    var folder = await Dynamo.get(folder_id, foldersTable);
+
+    var newSize = user.usedSpace - folder.folder_size;
+    
+    var res = await Dynamo.update({
+        tableName: usersTable,
+        primaryKey: "ID",
+        primaryKeyValue: user_id,
+        updateKey: "usedSpace",
+        updateValue: newSize
+    });
+
     await Dynamo.delete(folder_id, foldersTable);
 
-    return Responses._200({"message": "Success"});
+    return Responses._200({"message": "Successfully delete folder"});
+    //TODO delete keys from client side
 };
 
 exports.handler = withHooks(handler);

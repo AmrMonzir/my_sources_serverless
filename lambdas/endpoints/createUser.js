@@ -13,16 +13,16 @@ const handler = async event => {
     }
 
     let ID = event.pathParameters.ID;
+
     const user = event.body;
 
     user.ID = ID;
-    user.phoneNumber = event.body.phoneNumber;
-    user.email = event.body.email;
-    user.totalAvailableSpace = "500 MB";
-    user.images = {"imagesKeys":[], "thumbnailsKeys":[]};
-    user.videos = {"videosKeys":[], "thumbnailsKeys":[]};
-    user.documents = {"docKeys":[]};
-    user.social = {"urls":[]};
+    user.totalAvailableSpace = 512000; //500 MB
+    user.usedSpace = 0;
+    user.images = [];
+    user.videos = [];
+    user.documents = [];
+    user.social = [];
 
     const newUser = await Dynamo.write(user, tableName);
 
@@ -30,7 +30,7 @@ const handler = async event => {
         return Responses._400({message: "Failed to write user by id"});
     }
 
-    return Responses._200(newUser);
+    return Responses._200({"message" : `Successfully created user with ID ${ID}`});
 };
 
 exports.handler = withHooks(handler);
