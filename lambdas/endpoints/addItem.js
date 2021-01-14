@@ -31,12 +31,10 @@ const handler = async event => {
     var category = event.body.category.toLowerCase().trim();
     var url = event.body.url;
 
-
     var item = {
         "category": category,
-        "item_id": event.body.item_id,
+        "ID": event.body.item_id,
         "folder_id": folder_id,
-        "in_folder": this.folder_id ? true : false,
         "user_id": ID,
         "last_modified": event.body.last_modified,
         "timestamp": event.body.timestamp,
@@ -46,6 +44,12 @@ const handler = async event => {
         "url": url
     };
 
+    if(folder_id)
+        item["in_folder"] = true;
+    else
+        item["in_folder"] = false;
+
+    var user_id = ID;
 
     if(item.fileSizeKB < 0){
         return Responses._400({ "message" : "file Size Is Negative" });
@@ -55,21 +59,19 @@ const handler = async event => {
         return Responses._400({"message": "Quota is finished! Please upgrade"});
     }
 
-    var res;
-    if (item.in_folder) {
+    if (folder_id) {
 
         var folder = await Dynamo.get(folder_id, foldersTable);
-
+        if(!folder)
+            return Responses._400({"message" : "Can't find the destination folder"});
         var newContents = folder.contents;
+        newContents.push(item.ID);
 
-        newContents.push(item.item_id);
-
-        var newFolderSize = folder.folder_size + event.body.fileSizeKB;
-
-        var newUsedSpace = user.usedSpace + event.body.fileSizeKB;
+        var newFolderSize = folder.folder_size + item.fileSizeKB;
+        var newUsedSpace = user.usedSpace + item.fileSizeKB;
 
         //update folders table with new folder details
-        res = await Dynamo.update({
+        await Dynamo.update({
             tableName: foldersTable,
             primaryKey: "ID",
             primaryKeyValue: folder_id,
@@ -78,7 +80,7 @@ const handler = async event => {
         });
 
         //update folders table with new folder size
-        res = await Dynamo.update({
+        await Dynamo.update({
             tableName: foldersTable,
             primaryKey: "ID",
             primaryKeyValue: folder_id,
@@ -87,7 +89,7 @@ const handler = async event => {
         });
 
         //update usersTable with new used space
-        res = await Dynamo.update({
+        await Dynamo.update({
             tableName: usersTable,
             primaryKey: "ID",
             primaryKeyValue: user_id,
@@ -104,7 +106,7 @@ const handler = async event => {
 
         var newUsedSpace = user.usedSpace + event.body.fileSizeKB;
 
-        res = await Dynamo.update({
+        await Dynamo.update({
             tableName: usersTable,
             primaryKey: "ID",
             primaryKeyValue: user_id,
@@ -113,7 +115,7 @@ const handler = async event => {
         });
 
         // add item id to user category
-        res = await Dynamo.update({
+        await Dynamo.update({
             tableName: usersTable,
             primaryKey: "ID",
             primaryKeyValue: user_id,

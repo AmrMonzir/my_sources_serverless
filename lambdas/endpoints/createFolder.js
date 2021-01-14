@@ -1,7 +1,6 @@
 const Responses = require("../common/API_Responses");
 const Dynamo = require("../common/Dynamo");
 const { withHooks } = require("../common/hooks");
-const { v4: uuidv4 } = require('uuid');
 
 const foldersTable = process.env.foldersTable;
 const usersTable = process.env.usersTable;
@@ -28,7 +27,7 @@ const handler = async event =>{
 
     const folder = event.body;
 
-    const folder_id = event.body.folder_id;
+    const folder_id = event.body.ID;
 
     console.log(folder_id);
     var category = folder["category"].toLowerCase().trim();
