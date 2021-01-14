@@ -17,6 +17,7 @@ const handler = async event => {
     let user_id = event.pathParameters.ID;
 
     const startKey = event.body.startKey;
+    const folder_id = event.body.folder_id;
 
     const folder = await Dynamo.get(folder_id, foldersTable);
     const user = await Dynamo.get(user_id, usersTable);
@@ -28,16 +29,20 @@ const handler = async event => {
     console.log(folder);
     console.log(user);
 
-
+    const fid_cat = folder_id + folder.category;
+    console.log(fid_cat);
     var response = await Dynamo.query({
         tableName: itemsTable,
         index: "fid_cat",
         queryKey: "fid_cat",
-        queryValue: folder.folder_id + folder.category,
+        queryValue: fid_cat,
         startKey: startKey,
+        limit: 10,
     });
 
-    return Responses._200({ "items": response.items, "lastEvaluatedKey": response.LastEvaluatedKey });
+    console.log(response);
+
+    return Responses._200({ "items": response.Items, "lastEvaluatedKey": response.LastEvaluatedKey });
 };
 
 exports.handler = withHooks(handler);

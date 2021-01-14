@@ -24,8 +24,13 @@ const handler = async event => {
 
     var fileKey = event.body.fileKey;
 
-    var indx = fileKey.indexOf("/");
-    var thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
+    var indx;
+    var thumbKey;
+
+    if(fileKey){
+        indx = fileKey.indexOf("/");
+        thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
+    }
 
     var folder_id = event.body.folder_id;
     var category = event.body.category.toLowerCase().trim();
@@ -35,7 +40,7 @@ const handler = async event => {
         "category": category,
         "ID": event.body.item_id,
         "folder_id": folder_id,
-        "user_id": ID,
+        "uid": ID,
         "last_modified": event.body.last_modified,
         "timestamp": event.body.timestamp,
         "fileSizeKB": event.body.fileSizeKB,
@@ -62,6 +67,8 @@ const handler = async event => {
     if (folder_id) {
 
         var folder = await Dynamo.get(folder_id, foldersTable);
+        item["fid_cat"] = folder_id + category;
+
         if(!folder)
             return Responses._400({"message" : "Can't find the destination folder"});
         var newContents = folder.contents;
@@ -102,7 +109,7 @@ const handler = async event => {
     } else {
 
         var catContent = user[category];
-        catContent.push(item.item_id);
+        catContent.push(item.ID);
 
         var newUsedSpace = user.usedSpace + event.body.fileSizeKB;
 

@@ -18,6 +18,7 @@ const handler = async event => {
     //make sure ID exists in db
     const user = await Dynamo.get(ID, usersTable);
     const category = event.body.category;
+    const startKey = event.body.startKey;
 
     if (!user) {
         return Responses._404({ message: 'Failed to find user with that ID' });
@@ -31,6 +32,7 @@ const handler = async event => {
         index: 'id_cat',
         queryKey: 'id_cat',
         queryValue: ID + category,
+        startKey: startKey
     });
 
     return Responses._200({ "items": response.Items, "lastEvaluatedKey": response.LastEvaluatedKey });

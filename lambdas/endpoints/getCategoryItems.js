@@ -31,14 +31,16 @@ const handler = async event =>{
 
     var response = await Dynamo.query({
         tableName: itemsTable,
-        index: 'user_id',
-        queryKey: 'user_id',
+        index: 'uid',
+        queryKey: 'uid',
         queryValue: ID,
-        startKey: lastEvaluatedKey
+        startKey: lastEvaluatedKey,
+        limit: 15
     });
 
+    console.log(response);
 
-    return Responses._200({"items": response.items, "lastEvaluatedKey": response.LastEvaluatedKey});
+    return Responses._200({"items": response.Items, "lastEvaluatedKey": response.LastEvaluatedKey});
 };
 
 exports.handler = withHooks(handler);

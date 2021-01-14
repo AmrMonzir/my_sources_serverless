@@ -14,7 +14,7 @@ const Dynamo = {
         const data = await documentClient.get(params).promise();
 
         if(!data || !data.Item){
-            throw Error('There was an error fetching the data for ID of ${ID}, from ${TableName}');
+            throw Error(`There was an error fetching the data for ID of ${ID}, from ${TableName}`);
         }
 
         console.log(data);
@@ -86,7 +86,7 @@ const Dynamo = {
         return documentClient.update(params).promise();
     },
 
-    query: async ({tableName, index, queryKey, queryValue, startKey}) => {
+    query: async ({tableName, index, queryKey, queryValue, startKey, limit}) => {
         
         const  params = {
             TableName: tableName,
@@ -95,7 +95,8 @@ const Dynamo = {
             ExpressionAttributeValues: {
                 ':hkey': queryValue,
             },
-            ExclusiveStartKey: startKey
+            ExclusiveStartKey: startKey,
+            Limit: limit
         };
         
         console.log(params.KeyConditionExpression);

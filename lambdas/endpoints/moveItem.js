@@ -42,16 +42,11 @@ const handler = async event => {
         return Responses._400({ "message": "can't move to a different user's folder" });
     }
 
+    var isFound = false;
+
     if (sourceType === "category") {
         var user = await Dynamo.get(user_id, usersTable);
-
-        if (!user)
-            return Responses._400({ "message": "Can't find this user" });
-
         var item = await Dynamo.get(item_id, itemsTable);
-
-        if (!item)
-            return Responses._400({ "message": "Can't find this item" });
 
         var categoryContent = user[category];
 
@@ -60,7 +55,12 @@ const handler = async event => {
         categoryContent.forEach(element => {
             if (item_id !== element)
                 updatedContent.push(element);
+            else
+                isFound = true;
         });
+
+        if(!isFound)
+            return Responses._400({"message": "Can't find item_id in source category"});
 
         console.log("should now have deleted the item from category in userstable");
         console.log(updatedContent);
@@ -88,8 +88,13 @@ const handler = async event => {
 
         sourceFolderContents.forEach(element => {
             if (element !== item_id)
-                updatedContent.push(item_id);
+                updatedContent.push(element);
+            else
+                isFound = true;
         });
+
+        if(!isFound)
+            return Responses._400({"message": "Can't find item_id in source folder"});
 
         //delete item id from source folder
         await Dynamo.update({
@@ -120,7 +125,7 @@ const handler = async event => {
         tableName: foldersTable,
         primaryKey: "ID",
         primaryKeyValue: destFolderID,
-        updateKey: "content",
+        updateKey: "contents",
         updateValue: folderContents
     });
 

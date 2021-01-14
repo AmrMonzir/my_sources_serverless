@@ -4,6 +4,7 @@ const { withHooks } = require("../common/hooks");
 
 const foldersTable = process.env.foldersTable;
 const usersTable = process.env.usersTable;
+const itemsTable = process.env.itemsTable;
 
 const handler = async event =>{
 
@@ -26,17 +27,25 @@ const handler = async event =>{
     
     var folder = await Dynamo.get(folder_id, foldersTable);
 
+    
+
+    //now delete all items from db
+    var contentArray = folder.contents;
+    contentArray.forEach(async (element) => {
+        await Dynamo.delete(element, itemsTable);
+    });
+
+    await Dynamo.delete(folder_id, foldersTable);
+
     var newSize = user.usedSpace - folder.folder_size;
     
     var res = await Dynamo.update({
         tableName: usersTable,
         primaryKey: "ID",
-        primaryKeyValue: user_id,
+        primaryKeyValue: ID,
         updateKey: "usedSpace",
         updateValue: newSize
     });
-
-    await Dynamo.delete(folder_id, foldersTable);
 
     return Responses._200({"message": "Successfully delete folder"});
     //TODO delete keys from client side

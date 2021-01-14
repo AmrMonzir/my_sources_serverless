@@ -50,7 +50,7 @@ functions:
     events:
       - http:
           path: get-folder-items/{ID}
-          method: GET
+          method: POST
           cors: true
 
   listCategoryFolders:
@@ -170,6 +170,8 @@ resources:
             AttributeType: S
           - AttributeName: fid_cat
             AttributeType: S
+          - AttributeName: uid
+            AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
@@ -179,6 +181,12 @@ resources:
           - IndexName: fid_cat
             KeySchema:
               - AttributeName: fid_cat
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: uid
+            KeySchema:
+              - AttributeName: uid
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
