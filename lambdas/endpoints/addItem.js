@@ -47,6 +47,14 @@ const handler = async event => {
     };
 
 
+    if(item.fileSizeKB < 0){
+        return Responses._400({ "message" : "file Size Is Negative" });
+    }
+
+    if(user.usedSpace + item.fileSizeKB > user.totalAvailableSpace){
+        return Responses._400({"message": "Quota is finished! Please upgrade"});
+    }
+
     var res;
     if (item.in_folder) {
 

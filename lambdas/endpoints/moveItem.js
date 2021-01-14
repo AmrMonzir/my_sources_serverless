@@ -99,6 +99,16 @@ const handler = async event => {
             updateKey: "contents",
             updateValue: updatedContent
         });
+
+        var newFolderSize = sourceFolder.folder_size - item.fileSizeKB;
+
+        await Dynamo.update({
+            tableName: foldersTable,
+            primaryKey: "ID",
+            primaryKeyValue: sourceFolderID,
+            updateKey: "folder_size",
+            updateValue: newFolderSize
+        });
     }
 
     //put item_id in dest folder
@@ -113,6 +123,7 @@ const handler = async event => {
         updateKey: "content",
         updateValue: folderContents
     });
+
     //reflect container folder change in itemsTable
     await Dynamo.update({
         tableName: itemsTable,
@@ -120,6 +131,18 @@ const handler = async event => {
         primaryKeyValue: item_id,
         updateKey: "folder_id",
         updateValue: destFolderID
+    });
+
+
+    var newSize = destFolder.folder_size + item.fileSizeKB;
+
+    //reflect size change in dest folder
+    await Dynamo.update({
+        tableName: foldersTable,
+        primaryKey: "ID",
+        primaryKeyValue: destFolderID,
+        updateKey: "folder_size",
+        updateValue: newSize
     });
 
 
