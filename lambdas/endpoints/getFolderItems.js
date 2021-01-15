@@ -37,7 +37,7 @@ const handler = async event => {
         queryKey: "fid_cat",
         queryValue: fid_cat,
         startKey: startKey,
-        limit: 10,
+        limit: 20,
     });
 
     console.log(response);

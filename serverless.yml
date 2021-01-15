@@ -159,7 +159,7 @@ resources:
               - AttributeName: id_cat
                 KeyType: HASH
             Projection:
-              ProjectionType: KEYS_ONLY
+              ProjectionType: ALL
 
     ItemsTable:
       Type: AWS::DynamoDB::Table

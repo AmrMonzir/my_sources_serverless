@@ -36,7 +36,7 @@ const handler = async event => {
             tableName: foldersTable,
             primaryKey: 'ID',
             primaryKeyValue: folder_id,
-            updateKey: `isPinned`,
+            updateKey: `is_pinned`,
             updateValue: isPinned
         });
 
@@ -45,7 +45,7 @@ const handler = async event => {
             tableName: foldersTable,
             primaryKey: 'ID',
             primaryKeyValue: folder_id,
-            updateKey: `isPinned`,
+            updateKey: `is_pinned`,
             updateValue: isPinned
         });
 
@@ -54,7 +54,7 @@ const handler = async event => {
             tableName: foldersTable,
             primaryKey: 'ID',
             primaryKeyValue: folder_id,
-            updateKey: `isLocked`,
+            updateKey: `is_locked`,
             updateValue: isLocked
         });
     
