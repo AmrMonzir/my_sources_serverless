@@ -138,6 +138,14 @@ const handler = async event => {
         updateValue: destFolderID
     });
 
+    var fid_cat = destFolderID + category;
+    await Dynamo.update({
+        tableName: itemsTable,
+        primaryKey: "ID",
+        primaryKeyValue: item_id,
+        updateKey: "fid_cat",
+        updateValue: fid_cat
+    });
 
     var newSize = destFolder.folder_size + item.fileSizeKB;
 
@@ -149,6 +157,9 @@ const handler = async event => {
         updateKey: "folder_size",
         updateValue: newSize
     });
+
+
+    
 
 
     return Responses._200({ "message": "Moved file successfully" });
