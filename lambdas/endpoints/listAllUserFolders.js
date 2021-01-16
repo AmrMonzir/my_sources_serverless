@@ -2,7 +2,7 @@ const Responses = require("../common/API_Responses");
 const Dynamo = require("../common/Dynamo");
 const { withHooks } = require("../common/hooks");
 
-const tableName = process.env.foldersTable;
+const foldersTable = process.env.foldersTable;
 const usersTable = process.env.usersTable;
 
 const handler = async event =>{
@@ -23,13 +23,13 @@ const handler = async event =>{
     }
 
     const userFolders = await Dynamo.query({
-        tableName, 
+        tableName: foldersTable, 
         index: 'user_id',
         queryKey: 'user_id',
         queryValue: ID
     });
 
-    return Responses._200({userFolders});
+    return Responses._200(userFolders);
 };
 
 exports.handler = withHooks(handler);

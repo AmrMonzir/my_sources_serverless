@@ -148,6 +148,8 @@ resources:
             AttributeType: S
           - AttributeName: id_cat
             AttributeType: S
+          - AttributeName: user_id
+            AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
@@ -160,6 +162,12 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+          - IndexName: user_id
+            KeySchema:
+              - AttributeName: user_id
+                KeyType: HASH
+            Projection:
+              ProjectionType: KEYS_ONLY
 
     ItemsTable:
       Type: AWS::DynamoDB::Table

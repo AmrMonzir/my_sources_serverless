@@ -1,7 +1,10 @@
 const Responses = require("../common/API_Responses");
+const Dynamo = require("../common/Dynamo");
+const { withHooks } = require("../common/hooks");
 
 const usersTable = process.env.usersTable;
-exports.handler = async event =>{
+
+const handler = async event => {
     console.log('event', event);
 
     if(!event.pathParameters || !event.pathParameters.ID){
@@ -19,4 +22,6 @@ exports.handler = async event =>{
 
     //failed as ID was not in the data
     return Responses._400({message : 'No ID in data'});
-}
+};
+
+exports.handler = withHooks(handler);
