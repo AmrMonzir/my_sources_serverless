@@ -79,19 +79,19 @@ const handler = async event => {
 
         console.log(folderContents);
 
-        folderContents.forEach(element => {
-            if (item_id !== element)
-                newContent.push(element);
-        });
+        // folderContents.forEach(element => {
+        //     if (item_id !== element)
+        //         newContent.push(element);
+        // });
 
-        //now update folder entry to reflect the change
-        await Dynamo.update({
-            tableName: foldersTable,
-            primaryKey: "ID",
-            primaryKeyValue: folder_id,
-            updateKey: "contents",
-            updateValue: newContent
-        });
+        // //now update folder entry to reflect the change
+        // await Dynamo.update({
+        //     tableName: foldersTable,
+        //     primaryKey: "ID",
+        //     primaryKeyValue: folder_id,
+        //     updateKey: "contents",
+        //     updateValue: newContent
+        // });
 
         //now update folder entry to reflect size change
         await Dynamo.update({

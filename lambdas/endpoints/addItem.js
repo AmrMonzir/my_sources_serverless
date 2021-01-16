@@ -77,14 +77,14 @@ const handler = async event => {
         var newFolderSize = folder.folder_size + item.fileSizeKB;
         var newUsedSpace = user.usedSpace + item.fileSizeKB;
 
-        //update folders table with new folder details
-        await Dynamo.update({
-            tableName: foldersTable,
-            primaryKey: "ID",
-            primaryKeyValue: folder_id,
-            updateKey: "contents",
-            updateValue: newContents
-        });
+        // //update folders table with new folder details
+        // await Dynamo.update({
+        //     tableName: foldersTable,
+        //     primaryKey: "ID",
+        //     primaryKeyValue: folder_id,
+        //     updateKey: "contents",
+        //     updateValue: newContents
+        // });
 
         //update folders table with new folder size
         await Dynamo.update({

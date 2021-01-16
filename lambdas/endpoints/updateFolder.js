@@ -31,13 +31,13 @@ const handler = async event => {
     console.log("printing folder");
     console.log(folder);
 
-    if(name !== undefined && name !== undefined)
+    if(name !== undefined && name !== null)
         await Dynamo.update({
             tableName: foldersTable,
             primaryKey: 'ID',
             primaryKeyValue: folder_id,
-            updateKey: `is_pinned`,
-            updateValue: isPinned
+            updateKey: `name`,
+            updateValue: name
         });
 
     if (isPinned !== undefined && isPinned !== null)
