@@ -35,25 +35,7 @@ const handler = async event => {
 
         await Dynamo.delete(item_id, itemsTable);
 
-        var categoryContent = user[category];
-
-        console.log(categoryContent);
-
-        categoryContent.forEach(element => {
-            if (item_id !== element)
-                newContent.push(element);
-        });
-
         var newUsedSpaceUser = user.usedSpace - item.fileSizeKB;
-
-        //now update users table to reflect the change
-        await Dynamo.update({
-            tableName: usersTable,
-            primaryKey: "ID",
-            primaryKeyValue: user_id,
-            updateKey: `${category}`,
-            updateValue: newContent
-        });
 
         //now update users table to reflect the change
         await Dynamo.update({
@@ -73,25 +55,7 @@ const handler = async event => {
 
         await Dynamo.delete(item_id, itemsTable);
 
-        var folderContents = folder.contents;
-
         var newFolderSize = folder.folder_size - item.fileSizeKB;
-
-        console.log(folderContents);
-
-        // folderContents.forEach(element => {
-        //     if (item_id !== element)
-        //         newContent.push(element);
-        // });
-
-        // //now update folder entry to reflect the change
-        // await Dynamo.update({
-        //     tableName: foldersTable,
-        //     primaryKey: "ID",
-        //     primaryKeyValue: folder_id,
-        //     updateKey: "contents",
-        //     updateValue: newContent
-        // });
 
         //now update folder entry to reflect size change
         await Dynamo.update({

@@ -31,9 +31,9 @@ const handler = async event =>{
 
     var response = await Dynamo.query({
         tableName: itemsTable,
-        index: 'uid',
-        queryKey: 'uid',
-        queryValue: ID,
+        index: 'uid_cat',
+        queryKey: 'uid_cat',
+        queryValue: ID+category,
         startKey: lastEvaluatedKey,
         limit: 15
     });

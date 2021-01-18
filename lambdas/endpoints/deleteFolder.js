@@ -6,11 +6,11 @@ const foldersTable = process.env.foldersTable;
 const usersTable = process.env.usersTable;
 const itemsTable = process.env.itemsTable;
 
-const handler = async event =>{
+const handler = async event => {
 
-    if(!event.pathParameters.ID){
+    if (!event.pathParameters.ID) {
         //failed without an ID
-        return Responses._400({message: 'Missing the id from the path'});
+        return Responses._400({ message: 'Missing the id from the path' });
     }
 
     // have user id here
@@ -24,21 +24,32 @@ const handler = async event =>{
     }
 
     var folder_id = event.body.folder_id;
-    
+
     var folder = await Dynamo.get(folder_id, foldersTable);
 
-    
+    //delete all items that
 
     //now delete all items from db
-    var contentArray = folder.contents;
-    contentArray.forEach(async (element) => {
-        await Dynamo.delete(element, itemsTable);
+    // var contentArray = folder.contents;
+    // contentArray.forEach(async (element) => {
+    //     await Dynamo.delete(element, itemsTable);
+    // });
+
+    var queryResult = await Dynamo.query({
+        tableName: itemsTable,
+        index: "fid_cat",
+        queryKey: "fid_cat",
+        queryValue: folder_id + folder.category,
+        attrbutesToGet: "uid_cat"
     });
 
-    await Dynamo.delete(folder_id, foldersTable);
+    queryResult.items.foreach(async (element) => {
+        var eid = element.uid_cat.substring(0, element.uid_cat.indexOf(category));
+        await Dynamo.delete(eid, itemsTable)
+    });
 
     var newSize = user.usedSpace - folder.folder_size;
-    
+
     var res = await Dynamo.update({
         tableName: usersTable,
         primaryKey: "ID",
@@ -47,7 +58,9 @@ const handler = async event =>{
         updateValue: newSize
     });
 
-    return Responses._200({"message": "Successfully delete folder"});
+    await Dynamo.delete(folder_id, foldersTable);
+
+    return Responses._200({ "message": "Successfully delete folder" });
     //TODO delete keys from client side
 };
 

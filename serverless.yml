@@ -178,7 +178,7 @@ resources:
             AttributeType: S
           - AttributeName: fid_cat
             AttributeType: S
-          - AttributeName: uid
+          - AttributeName: uid_cat
             AttributeType: S
         KeySchema:
           - AttributeName: ID
@@ -192,9 +192,9 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: uid
+          - IndexName: uid_cat
             KeySchema:
-              - AttributeName: uid
+              - AttributeName: uid_cat
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

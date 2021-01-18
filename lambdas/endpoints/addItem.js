@@ -27,20 +27,18 @@ const handler = async event => {
     var indx;
     var thumbKey;
 
-    if(fileKey){
-        indx = fileKey.indexOf("/");
-        thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
-    }
+    
 
     var folder_id = event.body.folder_id;
     var category = event.body.category.toLowerCase().trim();
     var url = event.body.url;
 
+    var uid_cat = ID + category;
     var item = {
         "category": category,
         "ID": event.body.item_id,
         "folder_id": folder_id,
-        "uid": ID,
+        "uid_cat": uid_cat,
         "last_modified": event.body.last_modified,
         "timestamp": event.body.timestamp,
         "fileSizeKB": event.body.fileSizeKB,
@@ -48,6 +46,12 @@ const handler = async event => {
         "thumbKey": thumbKey,
         "url": url
     };
+
+    if(fileKey){
+        indx = fileKey.indexOf("/");
+        if(category === "images" || category === "videos")
+            thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
+    }
 
     if(folder_id)
         item["in_folder"] = true;

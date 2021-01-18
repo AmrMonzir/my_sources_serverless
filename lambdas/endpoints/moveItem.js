@@ -45,35 +45,7 @@ const handler = async event => {
     var isFound = false;
 
     if (sourceType === "category") {
-        var user = await Dynamo.get(user_id, usersTable);
-        var item = await Dynamo.get(item_id, itemsTable);
-
-        var categoryContent = user[category];
-
-        console.log(categoryContent);
-
-        categoryContent.forEach(element => {
-            if (item_id !== element)
-                updatedContent.push(element);
-            else
-                isFound = true;
-        });
-
-        if(!isFound)
-            return Responses._400({"message": "Can't find item_id in source category"});
-
-        console.log("should now have deleted the item from category in userstable");
-        console.log(updatedContent);
-
-        //now update users table to reflect the change
-        await Dynamo.update({
-            tableName: usersTable,
-            primaryKey: "ID",
-            primaryKeyValue: user_id,
-            updateKey: `${category}`,
-            updateValue: updatedContent
-        });
-
+        
     } else if (sourceType === "folder") {
         var sourceFolder = await Dynamo.get(sourceFolderID, foldersTable);
 
@@ -83,27 +55,6 @@ const handler = async event => {
         var item = await Dynamo.get(item_id, itemsTable);
         if (!item)
             return Responses._400({ "message": "Can't find this item" });
-
-        // var sourceFolderContents = sourceFolder.contents;
-
-        // sourceFolderContents.forEach(element => {
-        //     if (element !== item_id)
-        //         updatedContent.push(element);
-        //     else
-        //         isFound = true;
-        // });
-
-        // if(!isFound)
-        //     return Responses._400({"message": "Can't find item_id in source folder"});
-
-        // //delete item id from source folder
-        // await Dynamo.update({
-        //     tableName: foldersTable,
-        //     primaryKey: "ID",
-        //     primaryKeyValue: sourceFolderID,
-        //     updateKey: "contents",
-        //     updateValue: updatedContent
-        // });
 
         var newFolderSize = sourceFolder.folder_size - item.fileSizeKB;
 
@@ -115,19 +66,6 @@ const handler = async event => {
             updateValue: newFolderSize
         });
     }
-
-    //put item_id in dest folder
-    // var folderContents = destFolder.contents;
-
-    // folderContents.push(item_id);
-
-    // await Dynamo.update({
-    //     tableName: foldersTable,
-    //     primaryKey: "ID",
-    //     primaryKeyValue: destFolderID,
-    //     updateKey: "contents",
-    //     updateValue: folderContents
-    // });
 
     //reflect container folder change in itemsTable
     await Dynamo.update({
