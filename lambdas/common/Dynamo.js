@@ -86,21 +86,46 @@ const Dynamo = {
         return documentClient.update(params).promise();
     },
 
-    query: async ({tableName, index, queryKey, queryValue, startKey, limit, attrbutesToGet}) => {
-        
+    query: async ({tableName, index, queryKey, queryValue, startKey, limit, attributesToGet}) => {
         const  params = {
             TableName: tableName,
             IndexName: index,
             KeyConditionExpression: `${queryKey} = :hkey`,
+            ExclusiveStartKey: startKey,
+            Limit: limit,
+            ProjectionExpression: attributesToGet,
             ExpressionAttributeValues: {
                 ':hkey': queryValue,
             },
+        };
+
+        const res = await documentClient.query(params).promise();
+
+        return res || [];
+    },
+
+    search: async ({tableName, index, queryKey, queryValue, startKey, limit, attributesToGet, filterAttribute, searchWord}) => {
+        console.log(searchWord);
+        const  params = {
+            TableName: tableName,
+            IndexName: index,
+            KeyConditionExpression: `${queryKey} = :hkey`,
+            FilterExpression: filterAttribute? 'contains (#key, :searchWord)' : null,
             ExclusiveStartKey: startKey,
             Limit: limit,
-            ProjectionExpression: attrbutesToGet
+            ProjectionExpression: attributesToGet,
+            ExpressionAttributeNames: filterAttribute? {
+                "#key": filterAttribute
+            } : null,
+            ExpressionAttributeValues: {
+                ':hkey': queryValue,
+                ':searchWord': searchWord,
+            },
         };
+
+        console.log(searchWord);
         
-        console.log(params.KeyConditionExpression);
+        console.log(params.FilterExpression);
 
         const res = await documentClient.query(params).promise();
 

@@ -125,6 +125,14 @@ functions:
           method: POST
           cors: true
 
+  getItemsBySearch:
+    handler: lambdas/endpoints/getItemsBySearch.handler
+    events:
+      - http:
+          path: get-search-items/{ID}
+          method: POST
+          cors: true
+
 resources:
   Resources:
     MyDynamoDbTable:

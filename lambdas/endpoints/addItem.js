@@ -26,8 +26,14 @@ const handler = async event => {
 
     var indx;
     var thumbKey;
+    var searchName;
 
-    
+    if(fileKey){
+        indx = fileKey.indexOf("/");
+        thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
+        searchName = fileKey.substring(fileKey.indexOf("/") + 1).toLowerCase();
+    }
+
 
     var folder_id = event.body.folder_id;
     var category = event.body.category.toLowerCase().trim();
@@ -43,6 +49,7 @@ const handler = async event => {
         "timestamp": event.body.timestamp,
         "fileSizeKB": event.body.fileSizeKB,
         "key": fileKey,
+        "search_name": searchName,
         "thumbKey": thumbKey,
         "url": url
     };
