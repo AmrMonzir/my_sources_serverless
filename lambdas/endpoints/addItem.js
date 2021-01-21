@@ -33,11 +33,16 @@ const handler = async event => {
         thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
         searchName = fileKey.substring(fileKey.indexOf("/") + 1).toLowerCase();
     }
+    
 
 
     var folder_id = event.body.folder_id;
     var category = event.body.category.toLowerCase().trim();
     var url = event.body.url;
+
+    if(url){
+        searchName = event.body.post_title;
+    }
 
     var uid_cat = ID + category;
     var item = {
@@ -51,7 +56,10 @@ const handler = async event => {
         "key": fileKey,
         "search_name": searchName,
         "thumbKey": thumbKey,
-        "url": url
+        "url": url,
+        "post_data": event.body.post_data,
+        "post_title": event.body.post_title,
+        "post_time": event.body.post_time
     };
 
     if(fileKey){
