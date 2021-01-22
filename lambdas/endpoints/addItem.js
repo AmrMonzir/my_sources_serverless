@@ -41,7 +41,7 @@ const handler = async event => {
     var url = event.body.url;
 
     if(url){
-        searchName = event.body.post_title;
+        searchName = event.body.post_title.toLowerCase();
     }
 
     var uid_cat = ID + category;
@@ -59,7 +59,7 @@ const handler = async event => {
         "url": url,
         "post_data": event.body.post_data,
         "post_title": event.body.post_title,
-        "post_time": event.body.post_time
+        "type": event.body.type,
     };
 
     if(fileKey){
