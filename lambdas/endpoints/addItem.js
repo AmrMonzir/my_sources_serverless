@@ -40,10 +40,6 @@ const handler = async event => {
     var category = event.body.category.toLowerCase().trim();
     var url = event.body.url;
 
-    if(url){
-        searchName = event.body.post_title.toLowerCase();
-    }
-
     var uid_cat = ID + category;
     var item = {
         "category": category,
@@ -57,8 +53,6 @@ const handler = async event => {
         "search_name": searchName,
         "thumbKey": thumbKey,
         "url": url,
-        "post_data": event.body.post_data,
-        "post_title": event.body.post_title,
         "type": event.body.type,
     };
 
