@@ -35,18 +35,35 @@ const handler = async event => {
     //     await Dynamo.delete(element, itemsTable);
     // });
 
-    var queryResult = await Dynamo.query({
-        tableName: itemsTable,
-        index: "fid_cat",
-        queryKey: "fid_cat",
-        queryValue: folder_id + folder.category,
-        attrbutesToGet: "uid_cat"
-    });
+    var items = [];
 
-    queryResult.items.foreach(async (element) => {
-        var eid = element.uid_cat.substring(0, element.uid_cat.indexOf(category));
-        await Dynamo.delete(eid, itemsTable)
-    });
+    var isDone = false;
+    while (!isDone) {
+
+        var queryResult = await Dynamo.query({
+            tableName: itemsTable,
+            index: "fid_cat",
+            queryKey: "fid_cat",
+            queryValue: folder_id + folder.category,
+            attributesToGet: "ID"
+        });
+        console.log("now printing items list0");
+        items.push(queryResult.Items);
+        console.log(items);
+
+        if (!queryResult.LastEvaluatedKey)
+            isDone = true;
+    }
+
+    for (var i = 0; i < items[0].length; i++) {
+        var res = await Dynamo.delete(items[0][i].ID, itemsTable);
+        console.log("deleted item of id:");
+        console.log(items[0][i].ID);
+    }
+
+    // items.foreach(async (element) => {
+    //     // var eid = element.uid_cat.substring(0, element.uid_cat.indexOf(category));
+    // });
 
     var newSize = user.usedSpace - folder.folder_size;
 
