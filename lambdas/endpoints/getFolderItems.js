@@ -18,13 +18,16 @@ const handler = async event => {
 
     const startKey = event.body.startKey;
     const folder_id = event.body.folder_id;
-
+    var limit = event.body.limit;
     const folder = await Dynamo.get(folder_id, foldersTable);
     const user = await Dynamo.get(user_id, usersTable);
 
     if (!folder || !user) {
         return Responses._404({ message: 'Failed to find folder or user with that ID' });
     }
+
+    if (!limit)
+        limit = 10;
 
     console.log(folder);
     console.log(user);
@@ -37,7 +40,7 @@ const handler = async event => {
         queryKey: "fid_cat",
         queryValue: fid_cat,
         startKey: startKey,
-        limit: 10,
+        limit: limit,
     });
 
     console.log(response);
