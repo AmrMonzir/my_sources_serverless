@@ -121,8 +121,8 @@ const handler = async event => {
 
     } else {
 
-        var catContent = user[category];
-        catContent.push(item.ID);
+        // var catContent = user[category];
+        // catContent.push(item.ID);
 
         var newUsedSpace = user.usedSpace + event.body.fileSizeKB;
 
@@ -135,13 +135,13 @@ const handler = async event => {
         });
 
         // add item id to user category
-        await Dynamo.update({
-            tableName: usersTable,
-            primaryKey: "ID",
-            primaryKeyValue: user_id,
-            updateKey: category,
-            updateValue: catContent
-        });
+        // await Dynamo.update({
+        //     tableName: usersTable,
+        //     primaryKey: "ID",
+        //     primaryKeyValue: user_id,
+        //     updateKey: category,
+        //     updateValue: catContent
+        // });
 
         await Dynamo.write(item, itemsTable);
     }
