@@ -31,8 +31,6 @@ const handler = async event => {
     let sourceFolderID = event.body.sourceFolder;
     var item_id = event.body.item_id;
 
-    var updatedContent = [];
-
     var destFolder = await Dynamo.get(destFolderID, foldersTable);
 
     if (!destFolder) {
@@ -42,19 +40,17 @@ const handler = async event => {
         return Responses._400({ "message": "can't move to a different user's folder" });
     }
 
-    var isFound = false;
+    var item = await Dynamo.get(item_id, itemsTable);
+    if (!item)
+        return Responses._400({ "message": "Can't find this item" });
 
     if (sourceType === "category") {
-        
+
     } else if (sourceType === "folder") {
         var sourceFolder = await Dynamo.get(sourceFolderID, foldersTable);
 
         if (!sourceFolder)
             return Responses._400({ "message": "Can't find source folder" });
-
-        var item = await Dynamo.get(item_id, itemsTable);
-        if (!item)
-            return Responses._400({ "message": "Can't find this item" });
 
         var newFolderSize = sourceFolder.folder_size - item.fileSizeKB;
 
