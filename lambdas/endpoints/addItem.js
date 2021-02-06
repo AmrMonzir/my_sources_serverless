@@ -33,9 +33,11 @@ const handler = async event => {
         thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
         searchName = fileKey.substring(fileKey.indexOf("/") + 1).toLowerCase();
     }
+
+    if(event.body.url){
+        searchName = event.body.description;
+    }
     
-
-
     var folder_id = event.body.folder_id;
     var category = event.body.category.toLowerCase().trim();
     var url = event.body.url;
@@ -51,6 +53,7 @@ const handler = async event => {
         "fileSizeKB": event.body.fileSizeKB,
         "key": fileKey,
         "search_name": searchName,
+        "description": event.body.description,
         "thumbKey": thumbKey,
         "url": url,
         "type": event.body.type,
@@ -90,15 +93,6 @@ const handler = async event => {
         var newFolderSize = folder.folder_size + item.fileSizeKB;
         var newUsedSpace = user.usedSpace + item.fileSizeKB;
 
-        // //update folders table with new folder details
-        // await Dynamo.update({
-        //     tableName: foldersTable,
-        //     primaryKey: "ID",
-        //     primaryKeyValue: folder_id,
-        //     updateKey: "contents",
-        //     updateValue: newContents
-        // });
-
         //update folders table with new folder size
         await Dynamo.update({
             tableName: foldersTable,
@@ -121,9 +115,6 @@ const handler = async event => {
 
     } else {
 
-        // var catContent = user[category];
-        // catContent.push(item.ID);
-
         var newUsedSpace = user.usedSpace + event.body.fileSizeKB;
 
         await Dynamo.update({
@@ -133,15 +124,6 @@ const handler = async event => {
             updateKey: "usedSpace",
             updateValue: newUsedSpace
         });
-
-        // add item id to user category
-        // await Dynamo.update({
-        //     tableName: usersTable,
-        //     primaryKey: "ID",
-        //     primaryKeyValue: user_id,
-        //     updateKey: category,
-        //     updateValue: catContent
-        // });
 
         await Dynamo.write(item, itemsTable);
     }

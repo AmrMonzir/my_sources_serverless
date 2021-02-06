@@ -39,7 +39,6 @@ const handler = async event => {
             queryKey: "uid_cat",
             queryValue: uid_cat,
             startKey: startKey,
-            limit: 10,
             filterAttribute: "search_name",
             searchWord: searchWord,
         });
