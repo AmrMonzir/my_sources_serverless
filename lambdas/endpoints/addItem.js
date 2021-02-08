@@ -28,7 +28,7 @@ const handler = async event => {
     var thumbKey;
     var searchName;
 
-    if(fileKey){
+    if(fileKey && !event.body.url){
         indx = fileKey.indexOf("/");
         thumbKey = fileKey.slice(0, indx + 1) + "thumb-" + fileKey.slice(indx + 1);
         searchName = fileKey.substring(fileKey.indexOf("/") + 1).toLowerCase();
