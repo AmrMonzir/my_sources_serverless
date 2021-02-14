@@ -41,7 +41,7 @@ const handler = async event => {
     var folder_id = event.body.folder_id;
     var category = event.body.category.toLowerCase().trim();
     var url = event.body.url;
-
+    var type = event.body.type;
     var uid_cat = ID + category;
     var item = {
         "category": category,
@@ -56,7 +56,7 @@ const handler = async event => {
         "description": event.body.description,
         "thumbKey": thumbKey,
         "url": url,
-        "type": event.body.type,
+        "type": type,
     };
 
     if(fileKey){
@@ -91,7 +91,6 @@ const handler = async event => {
         newContents.push(item.ID);
 
         var newFolderSize = folder.folder_size + item.fileSizeKB;
-        var newUsedSpace = user.usedSpace + item.fileSizeKB;
 
         //update folders table with new folder size
         await Dynamo.update({
@@ -101,32 +100,43 @@ const handler = async event => {
             updateKey: "folder_size",
             updateValue: newFolderSize
         });
-
-        //update usersTable with new used space
-        await Dynamo.update({
-            tableName: usersTable,
-            primaryKey: "ID",
-            primaryKeyValue: user_id,
-            updateKey: "usedSpace",
-            updateValue: newUsedSpace
-        });
-
-        await Dynamo.write(item, itemsTable);
-
-    } else {
-
-        var newUsedSpace = user.usedSpace + event.body.fileSizeKB;
-
-        await Dynamo.update({
-            tableName: usersTable,
-            primaryKey: "ID",
-            primaryKeyValue: user_id,
-            updateKey: "usedSpace",
-            updateValue: newUsedSpace
-        });
-
-        await Dynamo.write(item, itemsTable);
     }
+
+    if(category == "social"){
+        var numOfPosts;
+        if(type == "twitter")
+            numOfPosts = user.twitter;
+        else if(type == "instagram")
+            numOfPosts = user.instagram;
+        else if(type == "snapchat")
+            numOfPosts = user.snapchat;
+        else if(type == "facebook")
+            numOfPosts = user.facebook;
+    
+        if(!numOfPosts)
+            numOfPosts = 0;
+    
+        await Dynamo.update({
+            tableName: usersTable,
+            primaryKey: "ID",
+            primaryKeyValue: user_id,
+            updateKey: type,
+            updateValue: numOfPosts + 1
+        });
+    }
+
+    //update usersTable with new used space
+    var newUsedSpace = user.usedSpace + event.body.fileSizeKB;
+
+    await Dynamo.update({
+        tableName: usersTable,
+        primaryKey: "ID",
+        primaryKeyValue: user_id,
+        updateKey: "usedSpace",
+        updateValue: newUsedSpace
+    });
+
+    await Dynamo.write(item, itemsTable);
 
     return Responses._200({ "message" : "Successfully added item" });
 };

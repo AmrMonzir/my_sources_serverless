@@ -19,6 +19,10 @@ const handler = async event => {
     user.ID = ID;
     user.totalAvailableSpace = 512000; //500 MB
     user.usedSpace = 0;
+    user.twitter = 0;
+    user.instagram = 0;
+    user.facebook = 0;
+    user.snapchat = 0;
 
     const newUser = await Dynamo.write(user, tableName);
 
