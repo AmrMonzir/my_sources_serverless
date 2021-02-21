@@ -133,6 +133,14 @@ functions:
           method: POST
           cors: true
 
+  makePurchase:
+    handler: lambdas/endpoints/makePurchase.handler
+    events:
+      - http:
+          path: make-purchase/{ID}
+          method: POST
+          cors: true
+
 resources:
   Resources:
     MyDynamoDbTable:
