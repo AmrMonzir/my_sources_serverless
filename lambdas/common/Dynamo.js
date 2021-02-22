@@ -63,7 +63,10 @@ const Dynamo = {
         const params = {
             TableName: tableName,
             Key: { [primaryKey]: primaryKeyValue },
-            UpdateExpression: `set ${updateKey} = :updateValue`,
+            UpdateExpression: 'set #key = :updateValue',
+            ExpressionAttributeNames: {
+                "#key": updateKey
+            },
             ExpressionAttributeValues: {
                 ':updateValue': updateValue,
             },
