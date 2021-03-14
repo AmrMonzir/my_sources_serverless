@@ -12,7 +12,7 @@ provider:
   name: aws
   runtime: nodejs12.x
   lambdaHashingVersion: 20201221
-  region: eu-west-1
+  region: eu-west-2
   environment:
     usersTable: ${self:custom.usersTable}
     foldersTable: ${self:custom.foldersTable}
