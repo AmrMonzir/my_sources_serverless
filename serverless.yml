@@ -115,6 +115,14 @@ functions:
       - http:
           path: update-folder/{ID}
           method: POST
+          cors: true       
+
+  updateUser:
+    handler: lambdas/endpoints/updateUser.handler
+    events:
+      - http:
+          path: update-user/{ID}
+          method: POST
           cors: true 
 
   removeItem:

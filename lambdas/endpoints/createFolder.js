@@ -29,7 +29,6 @@ const handler = async event =>{
 
     const folder_id = event.body.ID;
 
-    console.log(folder_id);
     var category = folder["category"].toLowerCase().trim();
     folder["ID"] = folder_id;
     folder["user_id"] = ID;
@@ -37,7 +36,28 @@ const handler = async event =>{
     folder["folder_size"] = 0;
     folder["contents"] = [];
 
+    if(!folder.name)
+        return Responses._400({"message" : "Folders must have names!"});
 
+    //make sure folder doesn't exist before
+    const categoryFolders = await Dynamo.query({
+        tableName: foldersTable,
+        index: 'id_cat',
+        queryKey: 'id_cat',
+        queryValue: ID + category
+    });
+
+    console.log(categoryFolders.Items.length);
+
+    for(let i = 0 ; i < categoryFolders.Items.length ; i++){
+        console.log(categoryFolders.Items[i]);
+        console.log(folder.name);
+        console.log(categoryFolders.Items[i]["name"]);
+        if(categoryFolders.Items[i]["name"] === folder.name){
+            return Responses._400({"message" : "Can't have duplicate folders"});
+        }
+    }
+    
     console.log(folder);
     const newFolder = await Dynamo.write(folder, foldersTable);
 
